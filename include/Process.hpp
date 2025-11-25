@@ -19,6 +19,7 @@ Process attach(const std::string& process_name);
 class Process : public Stream {
 public:
     explicit Process(const std::string& command);
+    explicit Process(const std::string& executable, const std::vector<std::string>& args);
 
     void send(const std::string& data) override;
     void sendline(const std::string& data) override;

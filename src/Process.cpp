@@ -16,39 +16,49 @@ namespace cpppwn {
 //----------------------------------------
 //
 //----------------------------------------
-Process attach(const std::string& process_name) {
-  return Process(process_name);
+Process attach(const std::string& executable, const std::vector<std::string>& args) {
+  return Process(executable, args);
 }
 
 //----------------------------------------
-//
+// safe constructor using execvp to avoid shell injection
 //----------------------------------------
-Process::Process(const std::string& command) {
-    int stdin_pipe[2], stdout_pipe[2];
+Process::Process(const std::string& executable, const std::vector<std::string>& args) {
+  int stdin_pipe[2];
+  int stdout_pipe[2];
 
-    if (pipe(stdin_pipe) < 0 || pipe(stdout_pipe) < 0) {
-        throw std::runtime_error("pipe() failed");
+  if (pipe(stdin_pipe) < 0 || pipe(stdout_pipe) < 0) {
+    throw std::runtime_error("pipe() failed");
+  }
+
+  pid_ = fork();
+  if (pid_ == 0) {
+    // child process
+    dup2(stdin_pipe[0], STDIN_FILENO);
+    dup2(stdout_pipe[1], STDOUT_FILENO);
+
+    ::close(stdin_pipe[1]);
+    ::close(stdout_pipe[0]);
+
+    // build argv array for execvp
+    std::vector<char*> argv;
+    argv.reserve(args.size() + 1);
+    for (const auto& arg : args) {
+      argv.push_back(const_cast<char*>(arg.c_str()));
     }
+    argv.push_back(nullptr);
 
-    pid_ = fork();
-    if (pid_ == 0) {
-        dup2(stdin_pipe[0], STDIN_FILENO);
-        dup2(stdout_pipe[1], STDOUT_FILENO);
+    execvp(executable.c_str(), argv.data());
+    _exit(1);
+  }
 
-        ::close(stdin_pipe[1]);
-        ::close(stdout_pipe[0]);
+  // parent process
+  ::close(stdin_pipe[0]);
+  ::close(stdout_pipe[1]);
 
-        execl("/bin/sh", "sh", "-c", command.c_str(), nullptr);
-        _exit(1);
-    }
-
-    // Parent
-    ::close(stdin_pipe[0]);
-    ::close(stdout_pipe[1]);
-
-    child_stdin_ = stdin_pipe[1];
-    child_stdout_ = stdout_pipe[0];
-    process_name_ = command;
+  child_stdin_ = stdin_pipe[1];
+  child_stdout_ = stdout_pipe[0];
+  process_name_ = executable;
 }
 
 //----------------------------------------
