@@ -6,11 +6,18 @@
 
 namespace cpppwn {
 
-// TODO: be able to set up a proxy server
-
 class Remote : public Stream {
 public:
+    class SocketImpl;
+
     Remote(const std::string& host, uint16_t port);
+
+    Remote(const std::string& host, uint16_t port, 
+        bool use_tls, bool verify_certificate = false
+    );
+
+    Remote(const std::string& host, uint16_t port, 
+        const std::string& proxy, bool use_tls = false);
 
     void send(const std::string& data) override;
     void sendline(const std::string& data) override;
@@ -30,10 +37,14 @@ public:
 
     void swap_socket(asio::ip::tcp::socket&& socket);
 
-    ~Remote();
+    ~Remote() override;
+
+    Remote(const Remote&) = delete;
+    Remote& operator=(const Remote&) = delete;
 
 private:
+
     asio::io_context io_;
-    asio::ip::tcp::socket socket_;
+    std::unique_ptr<SocketImpl> socket_;
 };
 } 

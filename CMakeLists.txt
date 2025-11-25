@@ -30,6 +30,7 @@ include(GNUInstallDirs)
 include(cmake/CPM.cmake)
 
 find_package(Threads REQUIRED)
+find_package(OpenSSL REQUIRED)
 
 # ---------------------------------------------------------
 # Fetch ASIO via CPM (header-only library, no real CMake)
@@ -49,7 +50,12 @@ target_compile_definitions(asio INTERFACE
     ASIO_NO_DEPRECATED
 )
 
-target_link_libraries(asio INTERFACE Threads::Threads)
+target_link_libraries(asio INTERFACE 
+  Threads::Threads
+  OpenSSL::SSL
+  OpenSSL::Crypto
+)
+
 target_link_libraries(cpppwn PRIVATE asio)
 
 # -------------------------------------

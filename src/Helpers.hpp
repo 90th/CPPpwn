@@ -3,6 +3,7 @@
 #include <atomic>
 #include <Stream.hpp>
 #include <iostream>
+#include <string>
 
 //----------------------------------------
 //
@@ -30,4 +31,35 @@ static inline void copy_stream_to_stdout(cpppwn::Stream* stream, std::atomic<boo
         // Silence any read errors on close
     }
     running = false;
+}
+
+//----------------------------------------
+//
+//----------------------------------------
+std::string base64_encode(const std::string& input) {
+  constexpr char base64_chars[]{ "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" };
+  
+  std::string result;
+  int val{ 0 };
+  int bits = -6;
+        
+  for(unsigned char c : input) {
+    val = (val << 8) + c;
+    bits += 8;
+            
+    while(bits >= 0) {
+      result.push_back(base64_chars[(val >> bits) & 0x3F]);
+      bits -= 6;
+    }
+  }
+        
+  if(bits > -6) {
+    result.push_back(base64_chars[((val << 8) >> (bits + 8)) & 0x3F]);
+  }
+        
+  while(result.size() % 4) {
+    result.push_back('=');
+  }
+        
+  return result;
 }
