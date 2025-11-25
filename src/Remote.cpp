@@ -20,21 +20,21 @@ Remote::Remote(const std::string& host, uint16_t port)
 //----------------------------------------
 //
 //----------------------------------------
-void Remote::send(const std::string& data) noexcept {
+void Remote::send(const std::string& data) {
     asio::write(socket_, asio::buffer(data));
 }
 
 //----------------------------------------
 //
 //----------------------------------------
-void Remote::sendline(const std::string& data) noexcept {
+void Remote::sendline(const std::string& data) {
     send(data + "\n");
 }
 
 //----------------------------------------
 //
 //----------------------------------------
-std::string Remote::recv(std::size_t size) noexcept {
+std::string Remote::recv(std::size_t size) {
     std::vector<char> buf(size);
     size_t len = asio::read(socket_, asio::buffer(buf, size));
     return std::string(buf.begin(), buf.begin() + len);
@@ -43,7 +43,7 @@ std::string Remote::recv(std::size_t size) noexcept {
 //----------------------------------------
 //
 //----------------------------------------
-std::string Remote::recvuntil(const std::string& delim) noexcept {
+std::string Remote::recvuntil(const std::string& delim) {
     asio::streambuf buf;
     asio::read_until(socket_, buf, delim);
     return std::string(asio::buffers_begin(buf.data()), asio::buffers_end(buf.data()));
@@ -59,7 +59,7 @@ bool Remote::is_alive() const noexcept {
 //----------------------------------------
 //
 //----------------------------------------
-void Remote::close() noexcept {
+void Remote::close() {
     asio::error_code ec;
     socket_.close(ec);
 }
@@ -102,7 +102,7 @@ int Remote::getOutputStream() noexcept {
 //----------------------------------------
 //
 //----------------------------------------
-std::string Remote::recvline() noexcept {
+std::string Remote::recvline() {
     return recvuntil("\n");
 }
 
