@@ -14,6 +14,7 @@ using buffer_t = std::vector<std::byte>;
 
 class Process;
 
+// TODO:
 Process attach(const std::string& process_name);  
 
 class Process : public Stream {
@@ -38,8 +39,14 @@ public:
 
     std::optional<address_t> findSignature(const std::string& signature);
 
+    // TODO:
     void writeMemory(const address_t address, const buffer_t& buffer);
+
+    // TODO:
     buffer_t readMemory(const address_t address);
+
+    // TODO:
+    //void loadLibrary(const std::string& path); //call dlopen()
 
     ~Process() override;
     friend Process attach(const std::string& process_name);  

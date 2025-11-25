@@ -6,6 +6,8 @@
 
 namespace cpppwn {
 
+// TODO: be able to set up a proxy server
+
 class Remote : public Stream {
 public:
     Remote(const std::string& host, uint16_t port);
