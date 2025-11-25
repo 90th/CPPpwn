@@ -16,52 +16,62 @@ namespace cpppwn {
 //----------------------------------------
 //
 //----------------------------------------
-Process attach(const std::string& process_name) {
-  return Process(process_name);
+Process attach(const std::string& executable, const std::vector<std::string>& args) {
+  return Process(executable, args);
+}
+
+//----------------------------------------
+// safe constructor using execvp to avoid shell injection
+//----------------------------------------
+Process::Process(const std::string& executable, const std::vector<std::string>& args) {
+  int stdin_pipe[2];
+  int stdout_pipe[2];
+
+  if (pipe(stdin_pipe) < 0 || pipe(stdout_pipe) < 0) {
+    throw std::runtime_error("pipe() failed");
+  }
+
+  pid_ = fork();
+  if (pid_ == 0) {
+    // child process
+    dup2(stdin_pipe[0], STDIN_FILENO);
+    dup2(stdout_pipe[1], STDOUT_FILENO);
+
+    ::close(stdin_pipe[1]);
+    ::close(stdout_pipe[0]);
+
+    // build argv array for execvp
+    std::vector<char*> argv;
+    argv.reserve(args.size() + 1);
+    for (const auto& arg : args) {
+      argv.push_back(const_cast<char*>(arg.c_str()));
+    }
+    argv.push_back(nullptr);
+
+    execvp(executable.c_str(), argv.data());
+    _exit(1);
+  }
+
+  // parent process
+  ::close(stdin_pipe[0]);
+  ::close(stdout_pipe[1]);
+
+  child_stdin_ = stdin_pipe[1];
+  child_stdout_ = stdout_pipe[0];
+  process_name_ = executable;
 }
 
 //----------------------------------------
 //
 //----------------------------------------
-Process::Process(const std::string& command) {
-    int stdin_pipe[2], stdout_pipe[2];
-
-    if (pipe(stdin_pipe) < 0 || pipe(stdout_pipe) < 0) {
-        throw std::runtime_error("pipe() failed");
-    }
-
-    pid_ = fork();
-    if (pid_ == 0) {
-        dup2(stdin_pipe[0], STDIN_FILENO);
-        dup2(stdout_pipe[1], STDOUT_FILENO);
-
-        ::close(stdin_pipe[1]);
-        ::close(stdout_pipe[0]);
-
-        execl("/bin/sh", "sh", "-c", command.c_str(), nullptr);
-        _exit(1);
-    }
-
-    // Parent
-    ::close(stdin_pipe[0]);
-    ::close(stdout_pipe[1]);
-
-    child_stdin_ = stdin_pipe[1];
-    child_stdout_ = stdout_pipe[0];
-    process_name_ = command;
-}
-
-//----------------------------------------
-//
-//----------------------------------------
-void Process::send(const std::string& data) noexcept {
+void Process::send(const std::string& data) {
     write(child_stdin_, data.data(), data.size());
 }
 
 //----------------------------------------
 //
 //----------------------------------------
-void Process::sendline(const std::string& data) noexcept {
+void Process::sendline(const std::string& data) {
     send(data + "\n");
 }
 
@@ -82,7 +92,7 @@ int Process::getOutputStream() noexcept {
 //----------------------------------------
 //
 //----------------------------------------
-std::string Process::recv(std::size_t size) noexcept {
+std::string Process::recv(std::size_t size) {
     std::vector<char> buf(size);
     ssize_t n = read(child_stdout_, buf.data(), size);
     return std::string(buf.begin(), buf.begin() + (n > 0 ? n : 0));
@@ -91,7 +101,7 @@ std::string Process::recv(std::size_t size) noexcept {
 //----------------------------------------
 //
 //----------------------------------------
-std::string Process::recvuntil(const std::string& delim) noexcept {
+std::string Process::recvuntil(const std::string& delim) {
     std::string out;
     char ch;
     while (read(child_stdout_, &ch, 1) == 1) {
@@ -106,14 +116,14 @@ std::string Process::recvuntil(const std::string& delim) noexcept {
 //----------------------------------------
 //
 //----------------------------------------
-std::string Process::recvline() noexcept {
+std::string Process::recvline() {
     return recvuntil("\n");
 }
 
 //----------------------------------------
 //
 //----------------------------------------
-std::string Process::recvall() noexcept {
+std::string Process::recvall() {
     std::string result;
     std::array<char, 4096> buf;
     ssize_t n;
@@ -138,7 +148,7 @@ bool Process::is_alive() const noexcept {
 //----------------------------------------
 //
 //----------------------------------------
-void Process::close() noexcept {
+void Process::close() {
     if (child_stdin_ != -1) {
         ::close(child_stdin_);
         child_stdin_ = -1;
