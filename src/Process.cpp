@@ -54,14 +54,14 @@ Process::Process(const std::string& command) {
 //----------------------------------------
 //
 //----------------------------------------
-void Process::send(const std::string& data) noexcept {
+void Process::send(const std::string& data) {
     write(child_stdin_, data.data(), data.size());
 }
 
 //----------------------------------------
 //
 //----------------------------------------
-void Process::sendline(const std::string& data) noexcept {
+void Process::sendline(const std::string& data) {
     send(data + "\n");
 }
 
@@ -82,7 +82,7 @@ int Process::getOutputStream() noexcept {
 //----------------------------------------
 //
 //----------------------------------------
-std::string Process::recv(std::size_t size) noexcept {
+std::string Process::recv(std::size_t size) {
     std::vector<char> buf(size);
     ssize_t n = read(child_stdout_, buf.data(), size);
     return std::string(buf.begin(), buf.begin() + (n > 0 ? n : 0));
@@ -91,7 +91,7 @@ std::string Process::recv(std::size_t size) noexcept {
 //----------------------------------------
 //
 //----------------------------------------
-std::string Process::recvuntil(const std::string& delim) noexcept {
+std::string Process::recvuntil(const std::string& delim) {
     std::string out;
     char ch;
     while (read(child_stdout_, &ch, 1) == 1) {
@@ -106,14 +106,14 @@ std::string Process::recvuntil(const std::string& delim) noexcept {
 //----------------------------------------
 //
 //----------------------------------------
-std::string Process::recvline() noexcept {
+std::string Process::recvline() {
     return recvuntil("\n");
 }
 
 //----------------------------------------
 //
 //----------------------------------------
-std::string Process::recvall() noexcept {
+std::string Process::recvall() {
     std::string result;
     std::array<char, 4096> buf;
     ssize_t n;
@@ -138,7 +138,7 @@ bool Process::is_alive() const noexcept {
 //----------------------------------------
 //
 //----------------------------------------
-void Process::close() noexcept {
+void Process::close() {
     if (child_stdin_ != -1) {
         ::close(child_stdin_);
         child_stdin_ = -1;

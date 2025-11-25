@@ -10,16 +10,16 @@ class Remote : public Stream {
 public:
     Remote(const std::string& host, uint16_t port);
 
-    void send(const std::string& data) noexcept override;
-    void sendline(const std::string& data) noexcept override;
+    void send(const std::string& data) override;
+    void sendline(const std::string& data) override;
 
-    [[nodiscard]] std::string recv(std::size_t size) noexcept override;
-    [[nodiscard]] std::string recvuntil(const std::string& delim) noexcept override;
-    [[nodiscard]] std::string recvline() noexcept override;
+    [[nodiscard]] std::string recv(std::size_t size) override;
+    [[nodiscard]] std::string recvuntil(const std::string& delim) override;
+    [[nodiscard]] std::string recvline() override;
     [[nodiscard]] std::string recvall() override;
 
     [[nodiscard]] bool is_alive() const noexcept override;
-    void close() noexcept override;
+    void close() override;
 
     [[nodiscard]] int getInputStream() noexcept override;
     [[nodiscard]] int getOutputStream() noexcept override;
