@@ -1,11 +1,11 @@
-#include "../include/Remote.hpp"
+#include <Remote.hpp>
 #include "Helpers.hpp"
 
 #include <asio/read_until.hpp>
 #include <asio/write.hpp>
 #include <iostream>
 
-namespace cppwntools {
+namespace cpppwn {
 
 //----------------------------------------
 //

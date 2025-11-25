@@ -1,4 +1,4 @@
-#include "../include/Process.hpp"
+#include <Process.hpp>
 #include "Helpers.hpp"
 
 #include <unistd.h>
@@ -12,7 +12,7 @@
 #include <thread>
 
 
-namespace cppwntools {
+namespace cpppwn {
 
 //----------------------------------------
 //

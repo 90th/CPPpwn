@@ -2,7 +2,7 @@
 
 #include "Remote.hpp"
 
-namespace cppwntools {
+namespace cpppwn {
 
 class Server {
 public:

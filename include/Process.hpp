@@ -4,7 +4,7 @@
 #include <string>
 #include <unistd.h>
 
-namespace cppwntools {
+namespace cpppwn {
 
 class Process : public Stream {
 public:

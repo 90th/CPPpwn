@@ -2,7 +2,7 @@
 #include <string>
 #include <cstddef>
 
-namespace cppwntools {
+namespace cpppwn {
 
 class Stream {
 public:

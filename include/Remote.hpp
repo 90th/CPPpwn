@@ -4,7 +4,7 @@
 #include <asio.hpp>
 #include <string>
 
-namespace cppwntools {
+namespace cpppwn {
 
 class Remote : public Stream {
 public:

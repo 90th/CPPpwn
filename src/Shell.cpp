@@ -1,12 +1,9 @@
-#include "../include/Shell.hpp"
+#include <Shell.hpp>
 
 #include <unistd.h>
-#include <thread>
-#include <atomic>
-#include <iostream>
 #include <sys/wait.h>
 
-namespace cppwntools {
+namespace cpppwn {
 
 //----------------------------------------
 //

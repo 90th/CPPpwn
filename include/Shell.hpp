@@ -3,7 +3,7 @@
 #include "Stream.hpp"
 #include <memory>
 
-namespace cppwntools {
+namespace cpppwn {
 
 void connect_shell(Stream& io);
 

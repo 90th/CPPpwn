@@ -6,7 +6,7 @@
 #include <iostream>
 
 int main() {
-    using namespace cppwntools;
+    using namespace cpppwn;
     
     /*
     constexpr bool is_local = false;
