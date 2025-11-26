@@ -2,11 +2,36 @@
 #include "../include/Process.hpp"
 #include "../include/Shell.hpp"
 #include "../include/Server.hpp"
+#include "../include/HttpClient.hpp"
+#include "../include/HttpServer.hpp"
 
-#include <iostream>
+#include <print>
 
 int main() {
     using namespace cpppwn;
+
+    //Process proc("/bin/bash", {"/bin/bash"});
+    //proc.sendline("echo 'Hello There!'");
+    //std::println("Output: {}", proc.recvline());
+
+    HttpServer server(8080);
+
+    server.get("/", [](const HttpRequest& req) {
+        return HttpResponse().set_html("<h1>Hello There!</h1>");
+    });
+
+    server.start();
+    
+    /*
+    HttpConfig config;
+    config.verbose = true;
+    config.browser_type = BrowserType::Firefox;
+
+    HttpClient client(config);
+    auto response = client.get("https://erarnitox.de");
+
+    std::println("Github Says: \n{}", response.body);
+    */
     
     /*
     constexpr bool is_local = false;
@@ -27,8 +52,8 @@ int main() {
     // connect_shell(*client);
 
     // Reverse Shell example
-    Remote conn("127.0.0.1", 3000);
-    connect_shell(conn);
+    // Remote conn("127.0.0.1", 3000);
+    // connect_shell(conn);
 
     /*
     while(conn->is_alive()) {

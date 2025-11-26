@@ -194,12 +194,12 @@ ParsedUrl parse_url(const std::string& url) {
       
   // Regex for URL parsing
   std::regex url_regex(
-    R"(^(https?):\/\/)"     // scheme
-    R"(([^:\/\?#]+))"       // host
-    R"((?::(\d+))?)"        // optional port
-    R"(([^?\#]*))"          // path
-    R"((?:\?([^#]*))?))"    // optional query
-    R"(((?:#(.*))?)$)",     // optional fragment
+    R"(^(https?):\/\/)"    // scheme
+    R"(([^:\/\?#]+))"      // host
+    R"((?::(\d+))?)"       // optional port
+    R"(([^?\#]*))"         // path
+    R"((?:\?([^#]*))?)"    // optional query
+    R"(((?:#(.*))?)$)",    // optional fragment
     std::regex::icase
   );
       
@@ -379,7 +379,7 @@ std::string HttpClient::build_request(
   }
     
   // Referer (if navigating from another page)
-  if(config_.send_browser_headers && !config_.referer.empty() &&
+  if(config_.send_browser_headers && not config_.referer.empty() &&
     headers.find("referer") == headers.end() &&
     headers.find("Referer") == headers.end()) {
     request << "Referer: " << config_.referer << "\r\n";
@@ -421,8 +421,9 @@ HttpResponse HttpClient::request(
   const std::string& url,
   const HttpHeaders& headers,
   const std::string& body) {
-    
+
   auto parsed_url = parse_url(url);
+
   const auto& profile = get_profile_for_type(config_.browser_type);
     
   // Create connection with TLS configuration
