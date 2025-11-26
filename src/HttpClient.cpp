@@ -1,4 +1,4 @@
-#include <HTTPClient.hpp>
+#include <HttpClient.hpp>
 #include "Helpers.hpp"
 
 #include <sstream>

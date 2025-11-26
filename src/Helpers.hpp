@@ -83,3 +83,31 @@ std::string url_encode(const std::string& value) {
   }
   return escaped.str();
 }
+
+//----------------------------------------
+//
+//----------------------------------------
+std::string url_decode(const std::string& str) {
+  std::string result;
+  result.reserve(str.size());
+        
+  for(size_t i = 0; i < str.size(); ++i) {
+    if(str[i] == '%' && i + 2 < str.size()) {
+      int value;
+      std::istringstream iss(str.substr(i + 1, 2));
+      if(iss >> std::hex >> value) {
+        result += static_cast<char>(value);
+        i += 2;
+      } else {
+        result += str[i];
+      }
+    } else if(str[i] == '+') {
+      result += ' ';
+    } else {
+      result += str[i];
+    }
+  }
+        
+  return result;
+}
+
