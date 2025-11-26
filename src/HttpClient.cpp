@@ -8,6 +8,7 @@
 #include <cctype>
 #include <random>
 #include <chrono>
+#include <fstream>
 
 namespace cpppwn {
 

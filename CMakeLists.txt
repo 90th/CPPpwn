@@ -10,6 +10,20 @@ add_library(cpppwn
     src/Shell.cpp
     src/HttpClient.cpp
     src/HttpServer.cpp
+    src/HttpUtils.cpp
+    src/RESTClient.cpp
+    src/RESTServer.cpp
+
+    # includes for some IDEs
+    include/Remote.hpp
+    include/Process.hpp
+    include/Server.hpp
+    include/Shell.hpp
+    include/HttpClient.hpp
+    include/HttpServer.hpp
+    include/HttpUtils.hpp
+    include/RESTClient.hpp
+    include/RESTServer.hpp
 )
 
 target_compile_features(cpppwn PUBLIC cxx_std_23)
@@ -35,9 +49,15 @@ find_package(Threads REQUIRED)
 find_package(OpenSSL REQUIRED)
 
 # ---------------------------------------------------------
-# Fetch ASIO via CPM (header-only library, no real CMake)
+# Fetch ASIO via CPM (header-only library)
 # ---------------------------------------------------------
-CPMAddPackage("gh:chriskohlhoff/asio#asio-1-34-2@1.34.2")
+CPMAddPackage("gh:chriskohlhoff/asio#asio-1-36-0@1.36.0")
+
+CPMAddPackage(
+  NAME glaze
+  GITHUB_REPOSITORY stephenberry/glaze
+  GIT_TAG v6.1.0
+)
 
 # Create a clean Asio target ourselves to avoid leaking paths
 add_library(asio INTERFACE)
@@ -59,6 +79,8 @@ target_link_libraries(asio INTERFACE
 )
 
 target_link_libraries(cpppwn PRIVATE asio)
+target_link_libraries(cpppwn PUBLIC glaze::glaze)
+target_link_libraries(cpppwn PUBLIC ${CMAKE_DL_LIBS})
 
 # -------------------------------------
 # Public include interface
